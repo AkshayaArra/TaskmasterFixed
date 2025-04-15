@@ -35,7 +35,7 @@ const columns = [
   },
 ];
 
-const API_URL = 'https://taskmaster-3-41fr.onrender.com';
+const API_URL = 'https://taskmaster-3-41fr.onrender.com/api';
 
 const KanbanBoard = () => {
   const [tasks, setTasks] = useState<Record<string, Omit<TaskCardProps, "index">[]>>({
