@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const taskSchema = new mongoose.Schema({
@@ -43,6 +42,11 @@ const taskSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+    required: true
+  },
+  workspace: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Workspace',
     required: true
   }
 }, {

@@ -6,6 +6,7 @@ import { PlusCircle, CheckCircle2, CircleDashed, CircleAlert, CircleEllipsis } f
 import { Button } from "@/components/ui/button";
 import TaskModal from "./TaskModal";
 import api from '@/lib/api';
+import { Workspace } from "@/services/workspaceService";
 
 // Column definitions for our board
 const columns = [
@@ -37,7 +38,11 @@ const columns = [
 
 const API_URL = 'https://taskmaster-3-41fr.onrender.com/api';
 
-const KanbanBoard = () => {
+interface KanbanBoardProps {
+  workspace: Workspace;
+}
+
+const KanbanBoard = ({ workspace }: KanbanBoardProps) => {
   const [tasks, setTasks] = useState<Record<string, Omit<TaskCardProps, "index">[]>>({
     todo: [],
     inProgress: [],
@@ -52,11 +57,19 @@ const KanbanBoard = () => {
   // Fetch tasks on component mount
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [workspace.id]); // Add workspace.id as dependency
 
   const fetchTasks = async () => {
     try {
-      const response = await api.get('/tasks');
+      const response = await api.get(`/tasks/${workspace.id}`);
+
+      // Reset tasks state with empty arrays before setting new data
+      const initialState = {
+        todo: [],
+        inProgress: [],
+        blocked: [],
+        done: [],
+      };
 
       // Group tasks by column
       const groupedTasks = response.data.reduce((acc: any, task: any) => {
@@ -73,7 +86,7 @@ const KanbanBoard = () => {
           commentsCount: task.commentsCount
         });
         return acc;
-      }, {});
+      }, initialState); // Use initialState instead of empty object
 
       setTasks(groupedTasks);
     } catch (error) {
@@ -140,7 +153,7 @@ const KanbanBoard = () => {
       } else {
         // Create new task
         await api.post(
-          '/tasks',
+          `/tasks/${workspace.id}`,
           taskData
         );
       }

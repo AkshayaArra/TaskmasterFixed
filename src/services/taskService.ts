@@ -1,4 +1,3 @@
-
 import { TaskCardProps } from "../components/kanban/TaskCard";
 import API_URL from "../config/api";
 
@@ -7,13 +6,13 @@ export interface Task extends Omit<TaskCardProps, "index"> {
   columnId: string;
 }
 
-// Fetch all tasks for the current user
-export const fetchTasks = async (): Promise<Record<string, Task[]>> => {
+// Fetch all tasks for a workspace
+export const fetchTasks = async (workspaceId: string): Promise<Record<string, Task[]>> => {
   try {
     const token = localStorage.getItem("taskmaster-token");
     if (!token) throw new Error("Not authenticated");
 
-    const response = await fetch(`${API_URL}/api/tasks`, {
+    const response = await fetch(`${API_URL}/api/tasks/${workspaceId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -24,7 +23,7 @@ export const fetchTasks = async (): Promise<Record<string, Task[]>> => {
     }
 
     const tasks = await response.json();
-    
+
     // Group tasks by columnId
     const groupedTasks: Record<string, Task[]> = {
       todo: [],
@@ -32,7 +31,7 @@ export const fetchTasks = async (): Promise<Record<string, Task[]>> => {
       blocked: [],
       done: []
     };
-    
+
     tasks.forEach((task: Task) => {
       const column = task.columnId || "todo";
       if (!groupedTasks[column]) {
@@ -40,7 +39,7 @@ export const fetchTasks = async (): Promise<Record<string, Task[]>> => {
       }
       groupedTasks[column].push(task);
     });
-    
+
     return groupedTasks;
   } catch (error) {
     console.error("Error fetching tasks:", error);
@@ -49,12 +48,12 @@ export const fetchTasks = async (): Promise<Record<string, Task[]>> => {
 };
 
 // Create a new task
-export const createTask = async (task: Omit<Task, "id">, columnId: string): Promise<Task> => {
+export const createTask = async (workspaceId: string, task: Omit<Task, "id">, columnId: string): Promise<Task> => {
   try {
     const token = localStorage.getItem("taskmaster-token");
     if (!token) throw new Error("Not authenticated");
 
-    const response = await fetch(`${API_URL}/api/tasks`, {
+    const response = await fetch(`${API_URL}/api/tasks/${workspaceId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

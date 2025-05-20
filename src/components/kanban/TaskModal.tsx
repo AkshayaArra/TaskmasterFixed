@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -26,10 +25,6 @@ const TaskModal = ({ isOpen, onClose, task, onSave }: TaskModalProps) => {
   const [priority, setPriority] = useState<TaskPriority>(task?.priority || "medium");
   const [dueDate, setDueDate] = useState<Date | undefined>(task?.dueDate);
 
-  // For real-time collaboration in a real app
-  const [activePeople, setActivePeople] = useState<string[]>([]);
-  const [isTyping, setIsTyping] = useState<string | null>(null);
-
   useEffect(() => {
     if (task) {
       setTitle(task.title || "");
@@ -38,16 +33,6 @@ const TaskModal = ({ isOpen, onClose, task, onSave }: TaskModalProps) => {
       setDueDate(task.dueDate);
     }
   }, [task]);
-
-  // Mock real-time typing indicator
-  useEffect(() => {
-    // In a real app, this would be socket-based
-    const typingTimeout = setTimeout(() => {
-      setIsTyping(null);
-    }, 2000);
-
-    return () => clearTimeout(typingTimeout);
-  }, [title, description]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,44 +50,11 @@ const TaskModal = ({ isOpen, onClose, task, onSave }: TaskModalProps) => {
     });
   };
 
-  // Mock real-time collaboration
-  useEffect(() => {
-    // Simulate someone else viewing the task
-    const timeout = setTimeout(() => {
-      setActivePeople(["Taylor W."]);
-
-      // Simulate typing
-      setTimeout(() => {
-        setIsTyping("Taylor W.");
-      }, 3000);
-    }, 2000);
-
-    return () => clearTimeout(timeout);
-  }, []);
-
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle>{task?.id ? "Edit Task" : "Add New Task"}</DialogTitle>
-
-          {activePeople.length > 0 && (
-            <div className="flex items-center mt-2 text-xs text-gray-500">
-              <div className="flex -space-x-2 mr-2">
-                {activePeople.map((person, i) => (
-                  <div
-                    key={i}
-                    className="h-5 w-5 rounded-full bg-taskmaster-purple text-white text-[10px] flex items-center justify-center border border-white"
-                  >
-                    {person.charAt(0)}
-                  </div>
-                ))}
-              </div>
-              <span>
-                {activePeople.join(", ")} {isTyping ? "is typing..." : "viewing"}
-              </span>
-            </div>
-          )}
         </DialogHeader>
 
         <form onSubmit={handleSubmit}>

@@ -11,6 +11,7 @@ const path = require('path');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const taskRoutes = require('./routes/tasks');
+const workspaceRoutes = require('./routes/workspaces');
 
 // Initialize app
 const app = express();
@@ -32,6 +33,7 @@ mongoose.connect(process.env.MONGODB_URI)
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/workspaces', workspaceRoutes);
 
 // Handle React routing, return all requests to React app
 app.get('*', (req, res) => {
